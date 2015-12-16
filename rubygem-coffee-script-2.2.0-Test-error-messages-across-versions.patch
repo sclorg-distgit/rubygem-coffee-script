@@ -1,0 +1,38 @@
+From 62abd5a9522b50e75f1756d550d4845c49b4a29f Mon Sep 17 00:00:00 2001
+From: Joshua Peek <josh@joshpeek.com>
+Date: Thu, 13 Mar 2014 15:21:28 -0400
+Subject: [PATCH] Test error messages across versions
+
+---
+ test/test_coffee_script.rb | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/test/test_coffee_script.rb b/test/test_coffee_script.rb
+index eb4fd73..a7988e5 100644
+--- a/test/test_coffee_script.rb
++++ b/test/test_coffee_script.rb
+@@ -48,11 +48,20 @@ def test_compile_with_no_wrap
+   end
+ 
+   def test_compilation_error
++    error_messages = [
++      # <=1.5
++      "Error: Parse error on line 1: Unexpected 'POST_IF'",
++      # 1.6
++      "SyntaxError: unexpected POST_IF",
++      # 1.7
++      "[stdin]:1:1: error: unexpected unless\nunless\n^^^^^^"
++    ]
+     begin
+       CoffeeScript.compile("unless")
+       flunk
+     rescue CoffeeScript::Error => e
+-      assert e
++      assert error_messages.include?(e.message),
++        "message was #{e.message.inspect}"
+     end
+   end
+ 
+-- 
+1.9.3
+

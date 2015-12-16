@@ -1,0 +1,40 @@
+From 60900187617ce7dcbb6ccd94fbdfddaa8022bd0a Mon Sep 17 00:00:00 2001
+From: Joshua Peek <josh@joshpeek.com>
+Date: Mon, 17 Feb 2014 17:25:02 -0600
+Subject: [PATCH] Condition minitest
+
+---
+ test/test_coffee_script.rb | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/test/test_coffee_script.rb b/test/test_coffee_script.rb
+index 9d27279..d43fbea 100644
+--- a/test/test_coffee_script.rb
++++ b/test/test_coffee_script.rb
+@@ -1,8 +1,21 @@
++begin
++  require 'minitest/autorun'
++rescue LoadError
++  require 'test/unit'
++end
++
++TestCase = if defined? Minitest::Test
++    Minitest::Test
++  elsif defined? MiniTest::Unit::TestCase
++    MiniTest::Unit::TestCase
++  else
++    Test::Unit::TestCase
++  end
++
+ require 'coffee_script'
+-require 'test/unit'
+ require 'stringio'
+ 
+-class TestCoffeeScript < Test::Unit::TestCase
++class TestCoffeeScript < TestCase
+   def test_compile
+     assert_equal "(function() {\n  puts('Hello, World!');\n}).call(this);\n",
+       CoffeeScript.compile("puts 'Hello, World!'\n")
+-- 
+1.9.3
+

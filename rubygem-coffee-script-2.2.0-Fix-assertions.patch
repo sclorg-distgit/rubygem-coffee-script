@@ -1,0 +1,70 @@
+From 9b34e37d7ecfa750f5185a0e16df1c131732e318 Mon Sep 17 00:00:00 2001
+From: Joshua Peek <josh@joshpeek.com>
+Date: Mon, 17 Feb 2014 17:30:04 -0600
+Subject: [PATCH] Fix assertions
+
+---
+ test/test_coffee_script.rb | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/test/test_coffee_script.rb b/test/test_coffee_script.rb
+index d43fbea..ad3c692 100644
+--- a/test/test_coffee_script.rb
++++ b/test/test_coffee_script.rb
+@@ -17,42 +17,46 @@
+ 
+ class TestCoffeeScript < TestCase
+   def test_compile
+-    assert_equal "(function() {\n  puts('Hello, World!');\n}).call(this);\n",
++    assert_match "puts('Hello, World!')",
+       CoffeeScript.compile("puts 'Hello, World!'\n")
+   end
+ 
+   def test_compile_with_io
+     io = StringIO.new("puts 'Hello, World!'\n")
+-    assert_equal "(function() {\n  puts('Hello, World!');\n}).call(this);\n",
++    assert_match "puts('Hello, World!')",
+       CoffeeScript.compile(io)
+   end
+ 
+   def test_compile_with_bare_true
+-    assert_equal "puts('Hello, World!');",
++    assert_no_match "function()",
+       CoffeeScript.compile("puts 'Hello, World!'\n", :bare => true)
+   end
+ 
+   def test_compile_with_bare_false
+-    assert_equal "(function() {\n  puts('Hello, World!');\n}).call(this);\n",
++    assert_match "function()",
+       CoffeeScript.compile("puts 'Hello, World!'\n", :bare => false)
+   end
+ 
+   def test_compile_with_no_wrap_true
+-    assert_equal "puts('Hello, World!');",
++    assert_no_match "function()",
+       CoffeeScript.compile("puts 'Hello, World!'\n", :no_wrap => true)
+   end
+ 
+   def test_compile_with_no_wrap
+-    assert_equal "(function() {\n  puts('Hello, World!');\n}).call(this);\n",
++    assert_match "function()",
+       CoffeeScript.compile("puts 'Hello, World!'\n", :no_wrap => false)
+   end
+ 
+   def test_compilation_error
+-    assert_raise CoffeeScript::CompilationError do
++    assert_raises CoffeeScript::CompilationError do
+       CoffeeScript.compile("unless")
+     end
+   end
+ 
++  def assert_no_match(expected, actual)
++    assert !expected.match(actual)
++  end
++
+   def assert_exception_does_not_match(pattern)
+     yield
+     flunk "no exception raised"
+-- 
+1.9.3
+
