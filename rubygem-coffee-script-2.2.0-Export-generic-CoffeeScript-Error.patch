@@ -1,0 +1,42 @@
+From eeee9a0cf4c092c034d49be531678fb2f6d1acd8 Mon Sep 17 00:00:00 2001
+From: Joshua Peek <josh@joshpeek.com>
+Date: Mon, 17 Feb 2014 18:07:01 -0600
+Subject: [PATCH] Export generic CoffeeScript::Error
+
+---
+ lib/coffee_script.rb       | 1 +
+ test/test_coffee_script.rb | 5 ++++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/lib/coffee_script.rb b/lib/coffee_script.rb
+index 9787565..bc154ec 100644
+--- a/lib/coffee_script.rb
++++ b/lib/coffee_script.rb
+@@ -2,6 +2,7 @@
+ require 'coffee_script/source'
+ 
+ module CoffeeScript
++  Error            = ExecJS::Error
+   EngineError      = ExecJS::RuntimeError
+   CompilationError = ExecJS::ProgramError
+ 
+diff --git a/test/test_coffee_script.rb b/test/test_coffee_script.rb
+index 0b3f897..eb4fd73 100644
+--- a/test/test_coffee_script.rb
++++ b/test/test_coffee_script.rb
+@@ -48,8 +48,11 @@ def test_compile_with_no_wrap
+   end
+ 
+   def test_compilation_error
+-    assert_raises CoffeeScript::CompilationError do
++    begin
+       CoffeeScript.compile("unless")
++      flunk
++    rescue CoffeeScript::Error => e
++      assert e
+     end
+   end
+ 
+-- 
+1.9.3
+
